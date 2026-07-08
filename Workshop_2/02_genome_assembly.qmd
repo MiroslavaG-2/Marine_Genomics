@@ -1,5 +1,5 @@
 ---
-title: "Genome Assembly"
+title: "Marine Genomics - Workshop 2"
 author: "Miroslava Guerrero"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
