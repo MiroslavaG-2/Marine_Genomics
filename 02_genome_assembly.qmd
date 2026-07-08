@@ -27,20 +27,134 @@ knitr::opts_chunk$set(
 	warning = FALSE)
 ```
 
-
 # Workshop 2 - Genome assembly
 
+The aim of this workshop is to assemble a small and simple genome, which will aid in assembling more complex meta genomes. This exercise will use data from a MinION run on a culture dominated by Vibrio. This organism has two large chromosomes, and some smaller plasmids.At high coverage it was also revealed that this data contained another bacterium 100 times less abundant than Vibrio.
 
+## Redbean assembly
 
+Firstly a directory for running the software will be prepared using the mkdir command, and changing into this directory by using cd.
 
+A small subset of data for the initial assembly will be collected, by using the first 3 files. This equates to 12000 reads and around 6x coverage of the target genome.
 
+```{bash}
+#| eval: false
+#| include: false
+cat /pvol/data/amtp4/*_[012].fastq > amtp4.fastq
 
+# run the assembly
+wtdbg2 -x ont -g 5m -t 4 -i amtp4.fastq -fo amtp4
 
+wtpoa-cns -t 4 -i amtp4.ctg.lay.gz -fo amtp4.ctg.fa
 
+```
 
+Now we redo the assembly using a better coverage depth, of \~20x coverage.
 
+```{bash}
+#| eval: false
+#| include: false
+cat /pvol/data/amtp4/*.fastq > amtp4_20x.fastq
 
+wtdbg2 -x ont -g 5m -t 4 -i amtp4_20x.fastq -fo amtp4_20x
 
+wtpoa-cns -t 4 -i amtp4_20x.ctg.lay.gz -fo amtp4_20x.ctg.fa
+
+#Reassess the assembly
+assembly-stats amtp4_20x.ctg.fa
+```
+
+## Flye assembly
+
+This is an alternative assembler, it is a more mature software project. Before running this assembly we need to set up a directory to store outputs and run commands
+
+### Inspect assembly graphs with Bandage
+
+We can use a tool called Bandage to inspect GFA files. We can download the assembly_graph.gfa of both the amtp4 and amtp4_20x and then load the graphs into bandage and draw the graphs.
+
+Here contiguous segments are shown as solid coloured lines, some of these are separated into independent graphs, and others are connected to each via black lines.
+
+1.  Biologically distinct entities will form separate graphs
+2.  Separated graphs can also occur if coverage is very low and no reads exist to join parts of the assembly together
+3.  Highly joined regions occur because repeats create ambiguities. Too many connections and the assembler has trouble choosing the correct path.
+
+Clicking on a contig shows the depth of read coverage assigned to it.
+
+Unresolved repeats look visually tangled, with many strands converging into a single point. That convergance is the telltale sign of a repeat. Meaning multiple contig paths are all connecting through that one shared node, because the assembler couldn't tell which path continues into which on the other side.
+
+Fully resolved contings look like near, separate horizontal lines, each one being its own independent, unconnected sequence, which is what we want to see for the easy part of the genome
+
+### Check assembly quality with QUAST
+
+Set up a quast working directory, and prepare assembly data by making two directories within the quast directory. These will be used to store the assemblies from flye and redbean.
+
+The reference assembly only contains contigs for the two major Vibrio chromosomes. We extract the two larges contigs from our two deeper coverage assemblies in order to make the assembly comparison easier to interpret.
+
+```{bash}
+#| eval: false
+#| include: false
+cat ../flye/amtp4_20x/assembly.fasta | bioawk -c fastx '{print $name, length($seq)}' | sort -n -k2
+
+cat ../redbean/amtp4_20x.ctg.fa | bioawk -c fastx '{print $name, length($seq)}' | sort -n -k2 
+
+# contig numbers might differ from assembly to assembly
+# use the two longest contings in your assembly
+samtools faidx ../flye/amtp4_20x/assembly.fasta contig_3 contig_15 > flye_asm/vibrio.fasta
+
+samtools faidx ../redbean/amtp4_20x.ctg.fa ctg1 ctg2 > redbean_asm/vibrio.fasta
+```
+
+```{bash}
+#| eval: false
+#| include: false
+
+# Run quast as follows
+quast -o quast_vibrio redbean_asm/vibrio.fasta flye_asm/vibrio.fasta -L -t 4 --circos --glimmer -r vibrio/vibrio.fna --features  vibrio/vibrio.gff --nanopore amtp4_20x.fastq
+```
+
+After Quast has ran, the outputs will be saved in a folder called quast_vibrio which can be downloaded. Here we can look at the main report and at a circos plot.
+
+### Extract repeat region sequence
+
+For this section a repeat region that could not be completely resolved will be used. To select a repeat in bandage, click directly on the small central node where all colored lines meet. This shows as a notably short length but high depth/ coverage, confirming it is a repeat.
+
+Once this repeat is selected go to output, and copy the repeat sequence to your clipboard.Then paste the output to a text file and add the header >repeat_1, this file should be saved into repeat/repeat.fasta.
+
+The command prokka can then be used on the sequence to see if it contains any transcribed sequences.
+
+### Genomic arrangement of repeats
+
+Now we know the genes that are present in the repeat but we don't know how the repeats are arranged in the genome. We are specifically interested if they are arranged in tandem or dispersed throughout the genome.
+
+To investigate this we can map the repeat sequence back to the genome itself by using minimap2.
+
+```{bash}
+#| eval: false
+#| include: false
+
+# link in the data
+ln -s ../quast/vibrio/vibrio.fna 
+
+# run minimap2
+minimap2 -x map-ont vibrio.fna repeat.fasta > repeat_vs_genome.paf
+
+# examine the alignment
+# extract important columns (those specifying the start and end point on the target) into a bed formatted file
+cat repeat_vs_genome.paf | grep '^repe' | awk -F '\t' '{print $6,$8,$9}' > repeat_locations.bed
+```
+
+Now using the repeat_locations.bed file we can look at where the repeat sequence aligns in the genome to answer if it's a tandem repeat or interspersed.
+
+Distinction between both:
+- Tandem repeat: repeated copies sit immediately next to each other, back-to-back, at essentially the same location, or short contiguous stretch in the genome.
+- Interspersed repeat:the repeated copies are scattered at different, separated locations - either on different contigs/chromosomes entirely, or far apart on the same one.
+
+To be able to tell apart from the file we can open it and look at it by writing: 
+cat repeat_locations.bed
+
+This will display three columns: contig/chromosome name, start position, end position. Then we can look at the number of lines/rows that there are, if the hits are on the same contig/chromosome or different ones, and if they are on the same one how far apart are the start and end positions.
+
+Based on the data we have it is an interspersed repeat, but not bey being in different chromosomes/cotigs. All six alignments are on the same contig (tig00000584), with each repeat copy being roughly 5000-5300 bp long, but with huge gaps between consecutive copies of around 95000-370000 bp apart.
 
 
 
