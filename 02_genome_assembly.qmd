@@ -39,7 +39,6 @@ A small subset of data for the initial assembly will be collected, by using the 
 
 ```{bash}
 #| eval: false
-#| include: false
 cat /pvol/data/amtp4/*_[012].fastq > amtp4.fastq
 
 # run the assembly
@@ -53,7 +52,6 @@ Now we redo the assembly using a better coverage depth, of \~20x coverage.
 
 ```{bash}
 #| eval: false
-#| include: false
 cat /pvol/data/amtp4/*.fastq > amtp4_20x.fastq
 
 wtdbg2 -x ont -g 5m -t 4 -i amtp4_20x.fastq -fo amtp4_20x
@@ -92,7 +90,6 @@ The reference assembly only contains contigs for the two major Vibrio chromosome
 
 ```{bash}
 #| eval: false
-#| include: false
 cat ../flye/amtp4_20x/assembly.fasta | bioawk -c fastx '{print $name, length($seq)}' | sort -n -k2
 
 cat ../redbean/amtp4_20x.ctg.fa | bioawk -c fastx '{print $name, length($seq)}' | sort -n -k2 
@@ -106,7 +103,6 @@ samtools faidx ../redbean/amtp4_20x.ctg.fa ctg1 ctg2 > redbean_asm/vibrio.fasta
 
 ```{bash}
 #| eval: false
-#| include: false
 
 # Run quast as follows
 quast -o quast_vibrio redbean_asm/vibrio.fasta flye_asm/vibrio.fasta -L -t 4 --circos --glimmer -r vibrio/vibrio.fna --features  vibrio/vibrio.gff --nanopore amtp4_20x.fastq
@@ -130,7 +126,6 @@ To investigate this we can map the repeat sequence back to the genome itself by 
 
 ```{bash}
 #| eval: false
-#| include: false
 
 # link in the data
 ln -s ../quast/vibrio/vibrio.fna 
@@ -154,7 +149,7 @@ cat repeat_locations.bed
 
 This will display three columns: contig/chromosome name, start position, end position. Then we can look at the number of lines/rows that there are, if the hits are on the same contig/chromosome or different ones, and if they are on the same one how far apart are the start and end positions.
 
-Based on the data we have it is an interspersed repeat, but not bey being in different chromosomes/cotigs. All six alignments are on the same contig (tig00000584), with each repeat copy being roughly 5000-5300 bp long, but with huge gaps between consecutive copies of around 95000-370000 bp apart.
+Based on the data we have it is an interspersed repeat, but not bey being in different chromosomes/cotigs. All six alignments are on the same contig (tig00000584), with each repeat copy being roughly 5,000-5,300 bp long, but with huge gaps between consecutive copies of around 95,000-370,000 bp apart.
 
 
 
