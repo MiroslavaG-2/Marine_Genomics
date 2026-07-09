@@ -1,0 +1,123 @@
+---
+title: "Marine Genomics Workshop 3"
+author: "Miroslava Guerrero"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+ html_document:
+    code_folding: show
+    collapse: no
+    df_print: paged
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 10
+    highlight: textmate
+    theme: spacelab
+    toc: yes
+    toc_float: yes
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+# Set options, housekeeping
+knitr::opts_chunk$set(
+	echo = TRUE,
+	include = TRUE,
+	message = FALSE,
+	warning = FALSE)
+```
+
+Binning and how it works
+
+# Workshop 3 - Metagenome assembly
+
+In this workshop we will assemble a mock metagenome consisting of five bacterial species, which is very simple compared to a real metagenome. Regardless it has been designed to capture some key challenges that are inherited when assembling a metagenome. This includes variable coverage and similar sequences. 
+
+For the purposes of metagenomic assembly we note the number of chromosomes, total genome size and its GC content.
+
+When assembling a full metagenomic assembly there will be two additional steps from when we assemble a single bacterial genome. Binning and Bin assessment which are unique to metagenome assembly. The steps are as follows:
+
+1. Examine Reads
+2. Assembly
+3. Basic assembly QC
+4. Binning
+5. Bin assessment
+
+## 1. Examine Reads
+
+Input data for this exercise consists of simulated reads from an Oxford Nanopore MinION sequencer, the data were simulated using a program called Badread.
+
+Make a new sub directory called raw_reads. Then make a symbolic link to the raw reads file in this directory. Afterwards we can check that all files are correct by using the ls command and -l to show extended details on each file.
+
+### Read length distribution 
+
+During the assembly process we will take shorter sequences (reads) and attempt to join them into longer sequences, an important determinant of success is the size of the raw reads themselves.
+
+Firstly we need to examine the read length distribution in the input data. The following code unzips the raw data and selects the top 40k lines in the file, and prints the outputs into a file called read_lengths.txt
+
+```{bash}
+#| eval: false
+zcat raw_data/raw_reads.fastq.gz | head -n 40000 | bioawk -c fastx '{print $name,length($seq)}' > read_lengths.txt
+
+```
+
+Then we create a plot to visualize the read lengths.
+
+```{r}
+library(tidyverse)
+
+rl_data <- read_tsv("read_lengths.txt",col_names = c("id","length"), show_col_types = FALSE)
+
+# Histogram of read lengths in the mock nanopore sequencing dataset
+ggplot(rl_data, aes(x=length/1000)) + 
+  geom_histogram(binwidth = 2) +
+  xlab("Read Length Kb") + ylab("Number of Reads")
+```
+
+### Calculating read N50
+
+Based on the plot above it is clear that the majority of reads are between 1 and 50kb in length. To summarize this we can use the N50 statistic, although it is more commonly used to summarize genome assemblies, it is also useful for summarizing read length distributions.
+
+N50 is useful as it is unaffected from having a large number of tiny reads and instead places greatest emphasis on the longer reads in the data. We will calculate the read N50 of the sample reads by following the next steps:
+
+1. Rank all reads from longest to shortest
+2. Create a new column with the cumulative sum of read lengths (starting with the longest)
+3. Find the read at which the cumulative sum surpass 50% of the total read volume (ie. total sum of all read lengths)
+
+```{r}
+total_len <- sum(rl_data$length)
+
+rl_data %>% 
+  arrange(desc(length)) %>% 
+  mutate(cumsum = cumsum(length)) %>% 
+  filter(cumsum>total_len/2) %>% 
+  head(n=1)
+```
+
+The above row describes a single sequencing read which is 22,322 bp long, and cumsum (cumulative sum of read lengths) is often used to figure out thing like "how many of my longest reads do i need to reach X times genome coverage", here it indicates that the running total of all read lengths so far reaches 74,486,252 bp.
+
+
+
+
+
+
+
+```{bash}
+#| eval: false
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
