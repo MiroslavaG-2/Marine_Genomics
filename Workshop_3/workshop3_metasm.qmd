@@ -96,6 +96,43 @@ rl_data %>%
 
 The above row describes a single sequencing read which is 22,322 bp long, and cumsum (cumulative sum of read lengths) is often used to figure out thing like "how many of my longest reads do i need to reach X times genome coverage", here it indicates that the running total of all read lengths so far reaches 74,486,252 bp.
 
+We see here that the N50 of individual reads is about 22kb, which needs to be kept in mind as we perform assembly, and expect that the N50 of the assembly should be considerably grater than this. 
+
+## 2. Assembly
+
+Assuming that we are satisfied with the overall quality of our reads, the first step is to assemble them using flye, as it is probably the best assembler for long-read metagenome data.
+We will firstly make a flye directory (mkdir) in the project folder and change directory (cd) to this new flye directory and run all flye commands from within this directory.
+
+We will run flye on the simulated data. First we create a new shell script, save it, run it, and monitor the job output (tail -f slurm-xxx.out). Flye will report the read N50, which we can compare with the value we computed earlier.
+
+Once the flye has finished running the outputs will be available in the directory mock. Key outputs are:
+- assembly.fasta = The actual assembled contigs
+- assembly_graph.gfa = representation of the assembly graph in gfa format (to be used in bandage)
+- assembly_graph.gv = assembly graph in graphviz format
+- assembly_info.txt = table of information on each contig.
+
+### Visualize the assembly using bandage
+
+Q1. What is the size and coverage of the largest contig in the assembly?
+Length: 4,681,059 bp
+Depth:
+
+Q2. The assembly should contain at least one (several) large circular contigs. Based on size and coverage you can guess which contig corresponds to the genome of the most abundant species in the mock community?
+
+
+### Chromosome lengths and GC content in the reference data
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
