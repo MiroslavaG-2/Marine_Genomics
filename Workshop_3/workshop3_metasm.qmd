@@ -115,39 +115,91 @@ Once the flye has finished running the outputs will be available in the director
 
 Q1. What is the size and coverage of the largest contig in the assembly?
 Length: 4,681,059 bp
-Depth:
+Depth:21.0x
 
-Q2. The assembly should contain at least one (several) large circular contigs. Based on size and coverage you can guess which contig corresponds to the genome of the most abundant species in the mock community?
+Q2. The assembly should contain at least one (or several) large circular contigs. Based on size and coverage you can guess which contig corresponds to the genome of the most abundant species in the mock community?
 
 
 ### Chromosome lengths and GC content in the reference data
 
+We will compare the assembled contigs with reference genomes from the five species that comprise our mock community by tabulating chromosome lengths and their corresponding GC content.
 
+Locating two circular chromosomes for Vibrio alfacsensis in bandage, using the outputs from gc.awk to help with it.
 
+Based on the table the four sequences that match to Vibrio based on the GC, the largest ones are the bacterial chromosomes, whereas the plasmids are the smaller ones.
+AP024165.1 (3,168,162 bp; 44% GC) and AP024166.1 (1,553,697 bp; 44% GC) are the clearly larger ones and circular chromosomes
 
+## 3. Basic assembly QC
 
+Previously we used gc.awk to print the length and GC content for reference sequences, now we do the same for the assembled contigs. 
 
+Now we can create some plots in R to explore the GC content and coverage depth of contigs. Two of the most useful statistics for grouping cotigs from the same species toghetehr are the GC content and the coverage depth, because these should generally be similar for contigs derived from the same chromosome.
 
+```{r}
+library(tidyverse)
+gc <- read_tsv("assembly_check/assembly.gc.tsv",col_names = c("#seq_name","length","GC"))
+info <- read_tsv("flye/mock/assembly_info.txt") 
+```
 
+```{r}
+# join datasets using seq_name
+gc_info <- info %>% 
+  left_join(gc)
 
+# plot - histogram of GC content values for assembled contigs in a flye assembly of the mock community dataset
+gc_info %>% 
+  ggplot(aes(x=GC)) + geom_histogram() + ylab("Number of contigs")
+```
 
+The following code and graph display a plot of GC vs coverage which helps identify clusters that have similar values for both parameters. By making this plot we filter the data to remove contigs with unrealistically high GC content and very high coverage depth (probably repeats)
 
+```{r}
+# plot - coverage and GC content assembled contigs in the mock community assembly. Contig lengths are shown through point size
 
+gc_info %>% 
+  filter(GC<0.8) %>% 
+  filter(cov.<25) %>% 
+  ggplot(aes(x=GC,y=cov.)) + geom_point(aes(size=length)) + ylab("Coverage depth")
+```
 
+```{r}
+# adding labels to look at the contigs with highest coverage and compare with contigs in bandage.
 
+library(ggrepel)
+gc_info %>% 
+  filter(GC<0.8) %>% 
+  filter(cov.<25) %>% 
+  ggplot(aes(x=GC,y=cov.)) + geom_point(aes(size=length)) + geom_label_repel(aes(label=`#seq_name`))
+```
 
+The cluster of contigs with high GC content (>60%) points towards Desulfovibrio sulfodismutans, while the coverage depth around 7.5x is likely to correspond to a different species, Vibrio algicola, with a much lower GC content
 
+### Assembly size vs reference size
 
+Since the mock metagenome has a precisely known composition we can asses its completeness by comparing the length of our assembly with that of the reference. Which can be done from within our top-level project directory.
+
+Firstly we calculate the total length of our reference sequences. Which tells us the total length is around 24Mb.
 
 ```{bash}
 #| eval: false
 
-
+cat /pvol/data/mg/refs/*.fna | bioawk -c fastx -f gc.awk | awk '{sum+=$2}END{print sum}'
 
 ```
 
+## 4. Binning
+
+One of the most challenging tasks in metagenomic assembly is separating sequences from many different organisms present in the sample. The tools that can be used fall into two categories:
+1. Read binning tools - group the raw (unassembled) reads
+2. Contig binning tools - group assembled contigs
+
+In both cases the resulting outputs are bins, and each of these contain multiple distinct sequences (reads or contigs) that come from the same organism. Common errors from binning include:
+1. Placing two sequences together when they come from different taxa - leads to contamination
+2. Failing to group sequences that come from the same taxon - leads to fragmentation.
 
 
+
+## 5. Check bin quality with checkM
 
 
 
