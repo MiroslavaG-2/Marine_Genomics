@@ -27,7 +27,6 @@ knitr::opts_chunk$set(
 	warning = FALSE)
 ```
 
-Binning and how it works
 
 # Workshop 3 - Metagenome assembly
 
