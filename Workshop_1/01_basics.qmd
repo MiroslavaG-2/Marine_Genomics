@@ -1,5 +1,5 @@
 ---
-title: "Command Line Basics"
+title: "Marine Genomics Workshop 1"
 author: "Miroslava Guerrero"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
@@ -29,7 +29,72 @@ knitr::opts_chunk$set(
 
 # Workshop 1 - Introduction to command line
 
-# write information on ls, cd, pwd
+This workshop was intended to getting familiar with the computer systems needed to complete the marine genomics workshops.
+
+An RStudio web interface will be used for the remaining of the workshops, which has all the necessary packages and data necessary for the workshops. 
+
+For this workshop we will work on the terminal, as it has the ability to interact with the underlying host operating system. Via the terminal we will be able to type unix commands
+
+## Basic unix commands
+
+Unix is suited to work with biological sequence files, including very large ones, and has several commands to process the data.Learning just a few unix commands also allows the user to do more than just a few things, as these can be combined in an almost unlimited fashion.
+
+One important thing to note is that understanding where you are in your directory is very important when using the command line. 
+
+### pwd - print working directory
+
+This command line allows you to see the path you are in within the directory tree. When we type this into the terminal, it finds and runs the pwd program and displays the output. 
+
+### General unix commands format
+
+They have up to three components:
+1. The command name
+2. Flags or modifiers (changes default behaviour)
+3. Arguments (input files, etc)
+
+### ls command 
+
+This command lists everything that is present in the current directory.
+
+Flags:
+The long format 'ls -l' gives us more information for each file or directory
+The reverse sort flag 'ls -lr' it shows the detailed information but in reverse order.
+
+Argument:
+We can also change the argument when we type 'ls -l /usr' it will by default display detail information but about the directory that was specified. 
+
+### mkdir command
+
+To make a new directory to store some work related data for instance, we can use the command mkdir. For example 'mkdir command_line'
+
+### cd command
+
+To move around and change directories, it can be used in the following way 'cd command_line' and check our directory by typing pwd. 
+To go back into the previous directory we can just type 'cd ..'
+
+### cat and head command
+
+The cat command is used to display the contents of a file directly in the terminal, for example 'cat test.fasta'
+While the head command can be used to display only the first few lines, for instance 'head -2 test.fasta' will only display the first two lines. 
+
+### grep command
+
+This stands for globally search regular expression and print. This command finds lines matching specific strings in files.For instance: 
+To find the fasta header we do the following 'grep '^>' test.fasta.
+To find a specific amino acid sequence we can type 'grep KDRNKKNSAK test.fasta'
+
+We can also find out more flags within grep by typing 'man grep'. an example of a flag is '-n' which reports line numbers of exact matches. So it can be combined like the following 'grep -n KDRNKKNSAK test.fasta', and it will display the line number included.
+
+
+
+
+
+
+
+
+
+
+
 
 
 
