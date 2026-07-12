@@ -1,4 +1,4 @@
-# MB5370 - Marine Genomics
+## MB5370 - Marine Genomics
 
 This repository contains information and supporting materials developed throughout _MB5370 – Marine Genomics_. The module aims to introduce and develop the skills required for genomic data processing through the use of Unix command line tools.
 
