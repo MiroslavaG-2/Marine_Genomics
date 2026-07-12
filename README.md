@@ -1,1 +1,7 @@
-# Marine_Genomics
+# MB5370 - Marine Genomics
+
+This repository contains information and supporting materials developed throughout _MB5370 – Marine Genomics_. The module aims to introduce and develop the skills required for genomic data processing through the use of Unix command line tools.
+
+This repository is organised by workshop, with each one building further on the knowledge and skills required for genomic assembly. The primary aim of the code contained within this repository is educational, introducing tools and programs for genomic processing and visualisation. The data used in the initial workshops comes from a mock bacterial assembly, while the final workshop used a subset of Black Band Disease (BBD) data collected by JCU PhD student Julia Hung.
+
+Workshop 1 introduces Unix command line tools and how these can be used to process and handle large biological sequence files. Workshop 2 focused on assembling a small genome to introduce the basic tools required for this, such as Flye and Redbean, along with Quast and Bandage, for processing, evaluating, and visualising the assembly. Workshop 3 introduced two additional tools required for metagenomic assembly: binning and bin assessment. Workshop 4 then served as a practical exercise to apply this knowledge to a real metagenomic assembly, using a subset of BBD data collected from fresh samples of infected _Acropora hyacinthus_ corals at Orpheus Island. This subset was provided and used to generate a complete metagenome assembly.
