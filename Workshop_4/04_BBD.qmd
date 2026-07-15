@@ -1,0 +1,47 @@
+---
+title: "Marine Genomics Workshop 4"
+author: "Miroslava Guerrero"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+ html_document:
+    code_folding: show
+    collapse: no
+    df_print: paged
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 10
+    highlight: textmate
+    theme: spacelab
+    toc: yes
+    toc_float: yes
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+# Set options, housekeeping
+knitr::opts_chunk$set(
+	echo = TRUE,
+	include = TRUE,
+	message = FALSE,
+	warning = FALSE)
+```
+
+# Workshop 4 - Functional analysis of the BBD metagenome
+
+A flye assembly, binning and bin assessment were conducted on the BBD metagenome. The overall goal of the functional metagenome analysis is to find what taxonomic groups of microbes are present and their function.
+
+The analyses that were conducted were focused on the most complete bins, as these contain the majority of useful information within the BBD community, these will also be the most abundant and best assembled members of the community. We therefore will focus on bins with a completeness greater than 15% and perform taxonomic classification with gtdbtk on these. 
+
+
+
+## Question - How many bins contain at least one gene from this pathway? and which bin has a complete pathway?
+
+## Question - How many bins contain the pathway PWY-5360? and what family do these bins belong to?
+
+
+
+
+
+
+
