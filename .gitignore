@@ -57,6 +57,8 @@ checkm/
 bak/
 assembly_check/
 /gc.awk
-/raw_data
-/minipath
+/raw_data/
+/minpath
+/read_lengths.txt
+/read_lengths.txt~
 
