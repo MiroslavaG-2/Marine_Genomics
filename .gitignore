@@ -49,3 +49,8 @@ po/*~
 rsconnect/
 
 #ignore
+prokka/
+metabat/
+gtdbtk/
+flye/
+checkm/
