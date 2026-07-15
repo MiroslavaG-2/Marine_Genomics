@@ -54,3 +54,9 @@ metabat/
 gtdbtk/
 flye/
 checkm/
+bark/
+assembly_check/
+/gc.awk
+/raw_data
+/read_lengths.txt
+
